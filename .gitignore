@@ -32,3 +32,6 @@ Thumbs.db
 *.crt
 *.key
 *.pem
+
+# MySQL data directory
+mysql-data/
