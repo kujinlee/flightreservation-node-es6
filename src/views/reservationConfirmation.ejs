@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reservation Confirmation</title>
+</head>
+<body>
+    <h2>Reservation Confirmation</h2>
+    <p>Reservation ID: <%= reservation.id %></p>
+    <p>Flight ID: <%= reservation.flightId %></p>
+    <p>Passenger ID: <%= reservation.passengerId %></p>
+    <p>Amount: $<%= typeof reservation.amount === 'number' ? reservation.amount.toFixed(2) : reservation.amount %></p>
+    <p>Card Number: <%= reservation.cardNumber %></p>
+    <p>Reservation created successfully!</p>
+
+    <a href="<%= BASE_URL %>/checkIn?reservationId=<%= reservation.id %>">Continue to Check-In</a>
+</body>
+</html>

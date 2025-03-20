@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Reservation</title>
+</head>
+<body>
+    <h2>Complete Reservation</h2>
+    <form action="<%= BASE_URL %>/completeReservation" method="post">
+        <label>Reservation ID: <input type="number" name="reservationId" required></label><br>
+        <label>Card Number: <input type="text" name="cardNumber" required></label><br>
+        <label>Expiry Date: <input type="text" name="expiryDate" required></label><br>
+        <label>CVV: <input type="text" name="cvv" required></label><br>
+        <h3>Passenger Information</h3>
+        <label>First Name: <input type="text" name="firstName" required></label><br>
+        <label>Last Name: <input type="text" name="lastName" required></label><br>
+        <label>Middle Name: <input type="text" name="middleName"></label><br>
+        <label>Email: <input type="email" name="email" required></label><br>
+        <label>Phone: <input type="text" name="phone" required></label><br>
+        <button type="submit">Complete Reservation</button>
+    </form>
+</body>
+</html>

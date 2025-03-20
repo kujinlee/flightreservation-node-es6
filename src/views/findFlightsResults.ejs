@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Search Results</title>
+</head>
+<body>
+    <h2>Flight Search Results</h2>
+    <% if (flights && flights.length > 0) { %> <!-- Ensure flights is defined -->
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>Airline</th>
+                    <th>Departure City</th>
+                    <th>Arrival City</th>
+                    <th>Departure Date</th>
+                    <th>Estimated Departure Time</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% flights.forEach(function(flight) { %> <!-- Use function syntax for compatibility -->
+                    <tr>
+                        <td><%= flight.flightNumber %></td>
+                        <td><%= flight.operatingAirlines %></td>
+                        <td><%= flight.departureCity %></td>
+                        <td><%= flight.arrivalCity %></td>
+                        <td><%= flight.dateOfDeparture %></td>
+                        <td><%= flight.estimatedDepartureTime %></td>
+                        <td>$<%= flight.price.toFixed(2) %></td>
+                        <td>
+                            <form action="<%= BASE_URL %>/reserve" method="get">
+                                <input type="hidden" name="flightId" value="<%= flight.id %>">
+                                <button type="submit">Reserve</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p><%= msg || "No flights found." %></p> <!-- Provide a default message -->
+    <% } %>
+</body>
+</html>
