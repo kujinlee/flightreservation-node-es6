@@ -27,3 +27,8 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Certificates
+*.crt
+*.key
+*.pem
