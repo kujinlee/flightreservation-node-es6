@@ -4,14 +4,40 @@
     <title>Reservation Confirmation</title>
 </head>
 <body>
-    <h2>Reservation Confirmation</h2>
-    <p>Reservation ID: <%= reservation.id %></p>
-    <p>Flight ID: <%= reservation.flightId %></p>
-    <p>Passenger ID: <%= reservation.passengerId %></p>
-    <p>Amount: $<%= typeof reservation.amount === 'number' ? reservation.amount.toFixed(2) : reservation.amount %></p>
-    <p>Card Number: <%= reservation.cardNumber %></p>
-    <p>Reservation created successfully!</p>
+    <div>
+        <h2>Reservation Confirmation</h2>
+        <p>Reservation ID: <%= reservation.id %></p>
+        <p>Flight ID: <%= reservation.flightId %></p>
+        <p>Passenger ID: <%= reservation.passengerId %></p>
+        <p>Amount: $<%= typeof reservation.amount === 'number' ? reservation.amount.toFixed(2) : reservation.amount %></p>
+        <p>Card Number: <%= reservation.cardNumber %></p>
+        <p><%= message || 'Reservation created successfully!' %></p>
 
-    <a href="<%= BASE_URL %>/checkIn?reservationId=<%= reservation.id %>">Continue to Check-In</a>
+        <a href="<%= BASE_URL %>/checkIn?reservationId=<%= reservation.id %>">Continue to Check-In</a>
+
+        <% if (showConfirmButton) { %>
+        <form action="<%= BASE_URL %>/completeReservation" method="POST" style="margin-top: 10px;">
+            <input type="hidden" name="reservationId" value="<%= reservation.id %>">
+            <button type="submit">Confirm Reservation</button>
+        </form>
+        <% } %>
+
+        <div style="margin-top: 20px;">
+            <h3>Flight Details</h3>
+            <p>Flight Number: <%= flightDetails.flightNumber %></p>
+            <p>Departure City: <%= flightDetails.departureCity %></p>
+            <p>Arrival City: <%= flightDetails.arrivalCity %></p>
+            <p>Date of Departure: <%= flightDetails.dateOfDeparture %></p>
+            <p>Estimated Departure Time: <%= flightDetails.estimatedDepartureTime %></p>
+
+            <h3>Passenger Details</h3>
+            <p>Name: <%= passengerDetails.name %></p>
+            <p>Email: <%= passengerDetails.email %></p>
+
+            <h3>Reservation Details</h3>
+            <p>Reservation ID: <%= reservation.id %></p>
+            <p>Amount Paid: $<%= typeof reservation.amount === 'number' ? reservation.amount.toFixed(2) : reservation.amount %></p>
+        </div>
+    </div>
 </body>
 </html>

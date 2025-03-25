@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import flightRoutes from './routes/flightRoutes.js';
 import { sequelize } from './models/index.js'; // Import sequelize and associations from index.js
 import errorHandler from './middleware/errorHandler.js';
+import { swaggerDocs, swaggerUi } from './config/swaggerConfig.js';
 
 dotenv.config();
 
@@ -31,6 +32,9 @@ app.use(BASE_URL, flightRoutes);
 
 // Register the global error handler
 app.use(errorHandler);
+
+// Swagger setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Load SSL/TLS certificates if HTTPS is enabled
 const USE_HTTPS = process.env.USE_HTTPS === 'true';

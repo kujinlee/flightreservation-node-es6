@@ -127,3 +127,83 @@ This is a Node.js implementation of the Flight Reservation System. It allows use
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+## User Interaction Flow
+
+1. **Search for Flights**:
+   - **Route**: `GET /findFlights`
+   - **Description**: Renders the `findFlights` view (flight search form).
+   - **Next Step**: User submits the form to search for flights.
+
+2. **View Flight Search Results**:
+   - **Route**: `POST /findFlights`
+   - **Description**: Executes the `findFlights` function to query the database for flights matching the search criteria. Renders the `findFlightsResults` view with the search results.
+   - **Next Step**: User selects a flight and clicks the "Reserve" button.
+
+3. **Reserve a Flight**:
+   - **Route**: `GET /reserve`
+   - **Description**: Executes the `renderReservationPage` function to render the `reserve` view with the selected flight details. The view contains a form to collect passenger data.
+   - **Next Step**: User submits the form to reserve the flight.
+
+4. **Create a Reservation**:
+   - **Route**: `POST /createReservation`
+   - **Description**: Executes the `createReservation` function to:
+     - Create a passenger object and save it in the database.
+     - Create a reservation object with the passenger ID and save it in the database.
+     - Render the `reservationConfirmation` view with reservation, flight, and passenger details.
+   - **Next Step**: User can either:
+     - Click the "Continue to Check-In" link to proceed to check-in.
+     - Click the "Confirm Reservation" button to complete the reservation.
+
+5. **Complete Reservation**:
+   - **Route**: `POST /completeReservation`
+   - **Description**: Executes the `completeReservation` function to:
+     - Process payment for the ticket using a mock payment function.
+     - Render the `reservationConfirmation` view with a success or failure message and a "Check-In" link.
+   - **Next Step**: User clicks the "Check-In" link to proceed to check-in.
+
+6. **Check-In**:
+   - **Route**: `GET /checkIn`
+   - **Description**: Executes the `renderCheckInPage` function to render the `checkIn` view. The view displays reservation details and contains a form to enter the "Number of Bags."
+   - **Next Step**: User submits the form to complete check-in.
+
+7. **Complete Check-In**:
+   - **Route**: `POST /completeCheckIn`
+   - **Description**: Executes the `completeCheckIn` function to:
+     - Update the reservation with the number of bags and mark it as checked in.
+     - Render the final reservation details.
+
+---
+
+## API Documentation with Swagger
+
+This project uses **Swagger** (OpenAPI) to document and test the API endpoints.
+
+### Setting Up Swagger
+
+1. Install Swagger dependencies:
+   ```bash
+   npm install swagger-ui-express swagger-jsdoc
+   ```
+
+2. Access the Swagger UI at `http://localhost:<port>/api-docs`.
+
+3. To add new routes, annotate them with Swagger comments in the route files.
+
+---
+
+## Running the Application
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the server:
+   ```bash
+   npm start
+   ```
+
+3. Access the application at `http://localhost:<port>`.

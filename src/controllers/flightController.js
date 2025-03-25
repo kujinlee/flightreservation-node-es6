@@ -26,7 +26,7 @@ export const findFlights = asyncHandler(async (req, res) => {
     }
 });
 
-export const completeCheckIn = asyncHandler(async (req, res) => {
+export const completeCheckIn = asyncHandler(async (req, res, next) => {
     const { reservationId, numberOfBags } = req.body;
 
     console.log('MYLOG: Check-in request body:', req.body);
@@ -39,7 +39,7 @@ export const completeCheckIn = asyncHandler(async (req, res) => {
     });
 
     if (!reservation) {
-        throw new CustomError('Reservation not found', 404);
+        return next(new CustomError('Reservation not found', 404));
     }
 
     console.log('MYLOG: Reservation before update:', reservation.toJSON());
@@ -60,18 +60,18 @@ export const completeCheckIn = asyncHandler(async (req, res) => {
     });
 });
 
-export const renderReservationPage = asyncHandler(async (req, res) => {
+export const renderReservationPage = asyncHandler(async (req, res, next) => {
     const { flightId } = req.query;
 
     const flight = await Flight.findByPk(flightId);
     if (!flight) {
-        throw new CustomError('Flight not found', 404);
+        return next(new CustomError('Flight not found', 404));
     }
 
     res.render('reserve', { flight });
 });
 
-export const createReservation = asyncHandler(async (req, res) => {
+export const createReservation = asyncHandler(async (req, res, next) => {
     const {
         flightId,
         firstName,
@@ -104,48 +104,95 @@ export const createReservation = asyncHandler(async (req, res) => {
 
     console.log('MYLOG: Reservation created:', reservation.toJSON());
 
-    res.render('reservationConfirmation', { reservation });
-});
-
-export const completeReservation = asyncHandler(async (req, res) => {
-    const {
-        reservationId,
-        cardNumber,
-        expiryDate,
-        cvv,
-        firstName,
-        lastName,
-        middleName,
-        email,
-        phone,
-    } = req.body;
-
-    const passenger = await Passenger.create({
-        first_name: firstName,
-        last_name: lastName,
-        middle_name: middleName || null,
-        email,
-        phone,
+    // Fetch flight details
+    const flightDetails = await Flight.findByPk(flightId, {
+        attributes: [
+            'flightNumber',
+            'departureCity',
+            'arrivalCity',
+            'dateOfDeparture',
+            'estimatedDepartureTime',
+        ],
     });
-
-    const reservation = await Reservation.findByPk(reservationId);
-    if (!reservation) {
-        throw new CustomError(`Reservation with ID ${reservationId} not found.`, 404);
+    if (!flightDetails) {
+        return next(new CustomError('Flight not found', 404));
     }
 
-    reservation.passengerId = passenger.id;
-    reservation.cardNumber = cardNumber;
-    await reservation.save();
-
-    res.send('Reservation completed successfully!');
+    // Render the confirmation page with the "Confirm Reservation" button
+    res.render('reservationConfirmation', {
+        reservation,
+        flightDetails,
+        passengerDetails: {
+            name: `${passenger.first_name} ${passenger.last_name}`,
+            email: passenger.email,
+        },
+        showConfirmButton: true,
+        message: 'Reservation created successfully!',
+        BASE_URL: process.env.BASE_URL,
+    });
 });
 
-export const renderCheckInPage = asyncHandler(async (req, res) => {
+export const completeReservation = asyncHandler(async (req, res, next) => {
+    const { reservationId } = req.body;
+
+    // Fetch reservation and associated passenger
+    const reservation = await Reservation.findByPk(reservationId, {
+        include: [{ model: Passenger, as: 'passenger' }],
+    });
+    if (!reservation) {
+        return next(new CustomError('Reservation not found', 404));
+    }
+
+    // Placeholder for external payment processing
+    const paymentSuccess = processPayment(reservation.cardNumber, reservation.amount);
+
+    // Fetch flight details
+    const flightDetails = await Flight.findByPk(reservation.flightId, {
+        attributes: [
+            'flightNumber',
+            'departureCity',
+            'arrivalCity',
+            'dateOfDeparture',
+            'estimatedDepartureTime',
+        ],
+    });
+    if (!flightDetails) {
+        return next(new CustomError('Flight not found', 404));
+    }
+
+    // Render the confirmation page with a success or failure message
+    res.render('reservationConfirmation', {
+        reservation,
+        flightDetails,
+        passengerDetails: {
+            name: `${reservation.passenger.first_name} ${reservation.passenger.last_name}`,
+            email: reservation.passenger.email,
+        },
+        showConfirmButton: false,
+        message: paymentSuccess
+            ? 'Payment processed successfully! You can now check in.'
+            : 'Payment failed. Please try again.',
+        BASE_URL: process.env.BASE_URL,
+    });
+});
+
+// Placeholder function for payment processing
+function processPayment(cardNumber, amount) {
+    console.log(`Processing payment for card: ${cardNumber}, amount: ${amount}`);
+    // Simulate payment success
+    return true;
+}
+
+export const renderCheckInPage = asyncHandler(async (req, res, next) => {
     const { reservationId } = req.query;
+
+    if (!reservationId) {
+        return next(new CustomError('Reservation ID is required', 400));
+    }
 
     const reservation = await Reservation.findByPk(reservationId);
     if (!reservation) {
-        throw new CustomError('Reservation not found', 404);
+        return next(new CustomError('Reservation not found', 404));
     }
 
     res.render('checkIn', { reservation });
