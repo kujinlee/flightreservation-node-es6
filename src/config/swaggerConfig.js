@@ -1,6 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
+import process from 'process';
 
 dotenv.config();
 
@@ -14,21 +15,21 @@ const HOST_PORT = process.env.DOCKER_ENV === 'true' ? EXPOSED_PORT : PORT;
 const protocol = USE_HTTPS ? 'https' : 'http';
 
 const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Flight Reservation API',
-            version: '1.0.0',
-            description: 'API documentation for the Flight Reservation system',
-        },
-        servers: [
-            {
-                url: `${protocol}://${HOST_URL}:${HOST_PORT}${BASE_URL}`,
-                description: 'Dynamic server based on environment configuration',
-            },
-        ],
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Flight Reservation API',
+      version: '1.0.0',
+      description: 'API documentation for the Flight Reservation system',
     },
-    apis: ['./src/routes/*.js'], // Path to your route files
+    servers: [
+      {
+        url: `${protocol}://${HOST_URL}:${HOST_PORT}${BASE_URL}`,
+        description: 'Dynamic server based on environment configuration',
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js'], // Path to your route files
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);

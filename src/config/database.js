@@ -1,46 +1,57 @@
+import mysql from 'mysql2/promise';
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import process from 'process';
+import logger from '../utils/logger.js';
 
-dotenv.config();
+dotenv.config(); // Load environment variables from .env file
 
-// Determine the database host
-// Use `host.docker.internal` if running in a container, otherwise fallback to `127.0.0.1`
-const DB_HOST = process.env.DB_HOST && process.env.DB_HOST.trim() !== '' 
-    ? process.env.DB_HOST 
-    : (process.env.DOCKER_ENV ? 'host.docker.internal' : '127.0.0.1');
+// Load database configuration from environment variables
+const DB_HOST =
+  process.env.DB_HOST ||
+  (process.env.DOCKER_ENV === 'true' ? 'mysql' : '127.0.0.1');
+const DB_PORT = process.env.DB_PORT || 3306;
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
+const DB_NAME = process.env.DB_NAME || 'reservation';
 
-// Determine the database port
-const DB_PORT = process.env.DOCKER_ENV === 'true' ? 3307 : 3306; // Use 3307 for containerized MySQL, otherwise default to 3306
+// Ensure the database exists (skip during tests)
+async function ensureDatabaseExists() {
+  if (process.env.NODE_ENV === 'test') {
+    logger.info('Skipping database initialization in test environment.');
+    return;
+  }
 
-// Initialize Sequelize instance
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+  const connection = await mysql.createConnection({
     host: DB_HOST,
-    port: DB_PORT, // Dynamically set the port
-    dialect: 'mysql',
-    logging: (msg) => {
-      console.log(`[Sequelize Log]: ${msg}`);
-    }, // Customize logging
-    define: {
-      freezeTableName: true, // Prevent Sequelize from pluralizing table names
-    },
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
+  });
+
+  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
+  logger.info(`Database "${DB_NAME}" ensured.`);
+  await connection.end();
+}
+
+// Call the function to ensure the database exists
+ensureDatabaseExists()
+  .then(() => {
+    logger.info('Database initialization completed successfully.');
+  })
+  .catch((error) => {
+    logger.error('Error ensuring database exists:', error);
+  });
+
+// Initialize Sequelize
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+  host: DB_HOST,
+  port: DB_PORT,
+  dialect: 'mysql',
+  logging: (msg) => logger.debug(`[Sequelize Log]: ${msg}`),
+  define: {
+    freezeTableName: true,
+  },
 });
-
-// Test the database connection
-sequelize.authenticate()
-  .then(() => {
-    console.log('Database connection established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-
-// Sync the database
-sequelize.sync({ alter: false, force: false })
-  .then(() => {
-    console.log('Database synchronized');
-  })
-  .catch(err => {
-    console.error('Error synchronizing the database:', err);
-  });
 
 export default sequelize;

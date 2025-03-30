@@ -35,3 +35,6 @@ Thumbs.db
 
 # MySQL data directory
 mysql-data/
+
+# Prettier ignore file
+.prettierignore

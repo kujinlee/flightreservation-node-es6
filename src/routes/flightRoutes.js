@@ -1,12 +1,12 @@
 import express from 'express';
 import {
-    renderFindFlights,
-    findFlights,
-    renderCheckInPage,
-    completeCheckIn,
-    renderReservationPage,
-    createReservation,
-    completeReservation
+  renderFindFlights,
+  findFlights,
+  renderCheckInPage,
+  completeCheckIn,
+  renderReservationPage,
+  createReservation,
+  completeReservation,
 } from '../controllers/flightController.js';
 
 const router = express.Router();

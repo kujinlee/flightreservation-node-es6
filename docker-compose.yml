@@ -5,14 +5,14 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_DATABASE: ${DB_NAME} # Ensure the database is created
     ports:
       - 3307:3306
     volumes:
-      - ./mysql-data:/var/lib/mysql
-      - ./sql-scripts:/docker-entrypoint-initdb.d
+      - ./mysql-data:/var/lib/mysql # Note: MySQL only runs the initialization scripts when the data directory is empty.
+      - ./sql-scripts:/docker-entrypoint-initdb.d # Automatically run SQL scripts
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 30s
       retries: 20
       timeout: 10s
@@ -20,7 +20,7 @@ services:
   flightreservation-node:
     build: .
     ports:
-      - "${EXPOSED_PORT}:${PORT}" # Map EXPOSED_PORT on the host to PORT in the container
+      - '${EXPOSED_PORT}:${PORT}' # Map EXPOSED_PORT on the host to PORT in the container
     depends_on:
       mysql:
         condition: service_healthy
