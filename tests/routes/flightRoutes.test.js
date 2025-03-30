@@ -9,7 +9,7 @@ jest.mock('../../src/models/flight.js'); // Mock the Flight model
 jest.mock('../../src/models/passenger.js'); // Mock the Passenger model
 jest.mock('../../src/models/reservation.js'); // Mock the Reservation model
 jest.mock('../../src/controllers/flightController.js', () => ({
-  renderFindFlights: jest.fn((req, res) => 
+  renderFindFlights: jest.fn((req, res) =>
     res.status(200).send('Find Flights')
   ),
   findFlights: jest.fn((req, res) =>
