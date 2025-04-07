@@ -46,10 +46,18 @@ const Passenger = sequelize.define(
         len: [10, 10], // Ensure the phone number is exactly 10 digits
       },
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at', // Map to snake_case column name
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at', // Map to snake_case column name
+    },
   },
   {
     tableName: 'passenger',
-    timestamps: true, // Enable timestamps for createdAt and updatedAt
+    timestamps: true, // Enable Sequelize to handle createdAt and updatedAt
   }
 );
 

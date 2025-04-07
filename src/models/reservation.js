@@ -59,10 +59,18 @@ const Reservation = sequelize.define(
         min: 0,
       },
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at', // Map to snake_case column name
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at', // Map to snake_case column name
+    },
   },
   {
     tableName: 'reservation',
-    timestamps: true, // Enable timestamps for createdAt and updatedAt
+    timestamps: true, // Enable Sequelize to handle createdAt and updatedAt
   }
 );
 

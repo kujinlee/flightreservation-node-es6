@@ -107,6 +107,102 @@ This is a Node.js implementation of the Flight Reservation System. It allows use
 
 ---
 
+## Environment Variables
+
+The application uses the following environment variables to configure its behavior:
+
+### 1. `DOCKER_ENV`
+- **Purpose**: Indicates whether the application is running in a Dockerized environment.
+- **Values**:
+  - `true`: The application is running inside a Docker container.
+  - `false`: The application is running in a non-Dockerized environment.
+- **Usage**:
+  - When `DOCKER_ENV=true`, the application uses `EXPOSED_PORT` for external access and assumes the database host is defined by `DB_HOST` (e.g., `mysql` in `docker-compose.yml`).
+  - When `DOCKER_ENV=false`, the application uses `PORT` for local access and assumes the database host is defined by `DB_HOST` (e.g., `127.0.0.1` or another hostname).
+
+### 2. `DB_HOST`
+- **Purpose**: Specifies the hostname or IP address of the database server.
+- **Default Value**: `127.0.0.1`
+- **Usage**:
+  - Can be set to:
+    - `127.0.0.1` or `localhost` for local development.
+    - An IP address (e.g., `192.168.1.100`) for remote databases.
+    - A Fully Qualified Domain Name (FQDN) (e.g., `db.example.com`) for production environments.
+  - Example:
+    - If `DB_HOST=db.example.com`, the application will connect to the database at `db.example.com`.
+
+### 3. `HOST_URL`
+- **Purpose**: Specifies the hostname or IP address of the server hosting the application.
+- **Default Value**: `localhost`
+- **Usage**:
+  - Can be set to:
+    - `localhost` for local development.
+    - An IP address (e.g., `192.168.1.100`) for remote servers.
+    - A Fully Qualified Domain Name (FQDN) (e.g., `app.example.com`) for production environments.
+  - Example:
+    - If `HOST_URL=app.example.com` and `PORT=8080`, the application will be accessible at `http://app.example.com:8080`.
+
+### 4. `EXPOSED_PORT`
+- **Purpose**: Specifies the external port for accessing the application in a Dockerized environment.
+- **Default Value**: Same as `PORT`
+- **Usage**:
+  - When `DOCKER_ENV=true`, the application uses `EXPOSED_PORT` to expose the application to the host machine.
+  - Example:
+    - If `EXPOSED_PORT=8082`, the application will be accessible at `http://localhost:8082`.
+
+### 5. `PORT`
+- **Purpose**: Specifies the internal port the application listens on.
+- **Default Value**: `8080`
+- **Usage**:
+  - Used in both Dockerized and non-Dockerized environments to define the port the application listens on internally.
+  - Example:
+    - If `PORT=8080`, the application listens on port `8080` inside the container or locally.
+
+---
+
+## Example `.env` File
+
+Below is an example `.env` file for both Dockerized and non-Dockerized environments:
+
+### Non-Dockerized Environment
+```plaintext
+DOCKER_ENV=false
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=reservation
+PORT=8080
+HOST_URL=localhost
+```
+
+### Dockerized Environment
+```plaintext
+DOCKER_ENV=true
+DB_HOST=mysql
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=yourpassword
+DB_NAME=reservation
+PORT=8080
+EXPOSED_PORT=8082
+HOST_URL=localhost
+```
+
+---
+
+## How These Variables Work Together
+
+1. **Non-Dockerized Environment**:
+   - The application listens on `PORT` (default: `8080`).
+   - The database is accessed at `DB_HOST` (e.g., `127.0.0.1`, `localhost`, or another hostname).
+
+2. **Dockerized Environment**:
+   - The application listens on `PORT` (default: `8080`) internally but is exposed externally on `EXPOSED_PORT` (default: `8082`).
+   - The database is accessed at `DB_HOST` (e.g., `mysql`, the service name in `docker-compose.yml`).
+
+---
+
 ## Directory Descriptions
 
 ### **`certs/`**
@@ -208,18 +304,113 @@ This project uses **Swagger** (OpenAPI) to document and test the API endpoints.
 
 ---
 
-## Running the Application
+## Running the Application in a Non-Dockerized Environment
 
-1. Install dependencies:
+To run the application in a non-dockerized environment, follow these steps:
 
-   ```bash
-   npm install
-   ```
+### 1. Prerequisites
+- Ensure you have the following installed:
+  - **Node.js** (version 16 or later)
+  - **MySQL** (version 5.7 or later)
 
-2. Start the server:
+### 2. Configure the `.env` File
+- Open the `.env` file in the root directory of the project.
+- Set the `DOCKER_ENV` value to `false` to indicate a non-dockerized environment:
+  ```plaintext
+  DOCKER_ENV=false
+  ```
+- Ensure the following values are set correctly for your local environment:
+  ```plaintext
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_USER=root
+  DB_PASSWORD=
+  DB_NAME=reservation
+  PORT=8080
+  ```
 
-   ```bash
-   npm start
-   ```
+### 3. Prepare the Database
+- Run the database setup script to create the schema and populate initial data:
+  ```bash
+  node scripts/setupDatabase.js
+  ```
 
-3. Access the application at `http://localhost:<port>`.
+### 4. Start the Application
+- Start the server:
+  ```bash
+  npm start
+  ```
+- The application will run on port `8080` by default.
+
+### 5. Test the Application
+- Open your browser and navigate to the following URL to start testing the application:
+  ```
+  http://localhost:8080/flightreservation-node-es6/findFlights
+  ```
+- Use the Swagger documentation to explore the API:
+  ```
+  http://localhost:8080/api-docs
+  ```
+
+---
+
+## Running the Application in a Dockerized Environment
+
+To run the application in a Dockerized environment, follow these steps:
+
+### 1. Prerequisites
+- Ensure you have the following installed:
+  - **Docker** (version 20.10 or later)
+  - **Docker Compose** (version 1.29 or later)
+
+### 2. Configure the `.env` File
+- Open the `.env` file in the root directory of the project.
+- Set the `DOCKER_ENV` value to `true` to indicate a Dockerized environment:
+  ```plaintext
+  DOCKER_ENV=true
+  ```
+- Ensure the following values are set correctly for the Dockerized environment:
+  ```plaintext
+  DB_HOST=mysql
+  DB_PORT=3306
+  DB_USER=root
+  DB_PASSWORD=yourpassword
+  DB_NAME=reservation
+  PORT=8080
+  EXPOSED_PORT=8082
+  ```
+
+### 3. Build and Start the Docker Containers
+- Build and start the containers using Docker Compose:
+  ```bash
+  docker-compose up --build
+  ```
+- This will start the application and the MySQL database in separate containers.
+
+### 4. Test the Application
+- Open your browser and navigate to the following URL to start testing the application:
+  ```
+  http://localhost:8082/flightreservation-node-es6/findFlights
+  ```
+- Use the Swagger documentation to explore the API:
+  ```
+  http://localhost:8082/api-docs
+  ```
+
+### 5. Stop the Containers
+- To stop the containers, run:
+  ```bash
+  docker-compose down
+  ```
+
+---
+
+## Notes for Both Environments
+
+- **Database Configuration**:
+  - Ensure the MySQL server is accessible at the specified `DB_HOST` and `DB_PORT`.
+  - For Dockerized environments, the `DB_HOST` should match the service name of the database container (e.g., `mysql`).
+
+- **Port Configuration**:
+  - Non-Dockerized environments use `PORT` (default: `8080`).
+  - Dockerized environments use `EXPOSED_PORT` (default: `8082`).

@@ -63,6 +63,14 @@ const Flight = sequelize.define(
         min: 0, // Ensure the price is non-negative
       },
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at', // Map to snake_case column name
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at', // Map to snake_case column name
+    },
   },
   {
     tableName: 'flight',

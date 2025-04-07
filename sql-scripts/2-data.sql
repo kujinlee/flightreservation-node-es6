@@ -1,4 +1,4 @@
-INSERT INTO flight (id, flight_number, operating_airlines, departure_city, arrival_city, date_of_departure, estimated_departure_time, price, createdAt, updatedAt) 
+INSERT INTO flight (id, flight_number, operating_airlines, departure_city, arrival_city, date_of_departure, estimated_departure_time, price, created_at, updated_at) 
 VALUES 
 (1, 'AA1', 'American Airlines', 'AUS', 'NYC', STR_TO_DATE('02-05-2024', '%m-%d-%Y'), '2024-02-05 03:14:07', 200.00, NOW(), NOW()),
 (2, 'AA2', 'American Airlines', 'AUS', 'NYC', STR_TO_DATE('02-05-2024', '%m-%d-%Y'), '2024-02-05 05:14:07', 200.00, NOW(), NOW()),
